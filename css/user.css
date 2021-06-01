@@ -1,0 +1,137 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+body {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.header {
+    margin: 10px auto;
+    font-size: larger;
+}
+
+table {
+    width: 80%;
+    border-spacing: 0;
+}
+
+thead > tr > th {
+    height: 5px;
+    background-color: #ed7f3d;
+}
+
+tbody > tr > td {
+    padding: 10px;
+    margin: 0;
+}
+
+tbody > tr:nth-child(odd) > td{
+    background-color: white;
+}
+
+tbody > tr:nth-child(even) > td {
+    background-color: #e8e8e8;
+}
+
+.wrapper {
+    background-color: transparent;
+    display: flex;
+    position: relative;
+    justify-content:flex-end;
+}
+
+.round {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    width: 10px;
+    height: 10px;
+    background-color: #057d36;
+    border-radius: 50%;
+}
+
+img {
+    width: 8px;
+    height: 8px;
+    background-color: transparent;
+}
+
+tbody p {
+    background-color: transparent;
+}
+
+tbody > tr > td:nth-child(2) > p:nth-child(2) {
+    color: #757575;
+}
+
+footer {
+    background-color: #e8e8e8;
+    height: 20px;
+    width: 100%;
+    margin-top: 20px;
+    position: fixed;
+    bottom: 0;
+}
+
+footer > div {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+}
+
+footer > div > span {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;    
+    font-size: 10px;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+footer > div > span:hover{
+    font-weight: bolder;
+}
+
+.pages {
+    position: fixed;
+    bottom: 10px;
+}
+
+ul {
+    list-style-type: none;
+    margin: 15px 0;
+}
+
+ul li {
+    display: inline;
+    cursor: pointer;
+    font-size: smaller;
+    padding: 2px;
+}
+
+.selected {
+    border-bottom: 1px solid #ed7f3d;
+}
+
+ul li:hover {
+    border-bottom: 1px solid #ed7f3d;
+}
+
+ul li img {
+    margin-left: 2px;
+}
+

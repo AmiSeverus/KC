@@ -1,0 +1,145 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/user.css">
+    <title>Users</title>
+</head>
+<body onload="getUsers(1)">
+    <div class="header">User List</div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th colspan="3"></th>
+            </tr>
+        </thead>
+        <tbody id="usersList">
+            
+        </tbody>
+    </table>
+    <div class="pages">
+        <ul id="pagesList">           
+        </ul>
+    </div>
+    <footer>
+        <div>
+            <span onclick='logOut()'><img src="./img/sign-out-alt-solid.png" alt="logout">&nbsp;Log Out</span>
+        </div>
+    </footer>
+</body>
+
+<script>
+
+    //получение списка выводимых юзеров, 
+    //в параметр page передается номер номер страницы, 
+    //которую надо вывести и юзеры соответствующие ей
+    //пагинация реализована на стороне back,
+    //фронт получает уже готовый список юзеров для отрисовки
+    async function getUsers(page){
+        let res = await fetch('http://test/KC/server/users/' + page, {
+            headers: {
+                'Content-Type': 'application/json',
+                'charset':'UTF-8',
+            }
+        });
+        let data = await res.json();
+        let users = data[0];
+        let pages = Math.ceil(data[1].cnt / 5);
+        let htmlP = '';
+        //определяем какая страница д.б. выделена - активна
+        for (i = 1; i <= pages; i++){
+            if (i == page){
+                htmlP += "<li class='selected' onclick='getUsers(" + i + ")'>" + i + "</li>";
+            } else {
+                htmlP += "<li onclick='getUsers(" + i + ")'>" + i + "</li>"
+            }
+        }
+        //отрисовываем юзеров
+        document.getElementById('pagesList').innerHTML = htmlP + "<li><span onclick='nextPage(event)'>Next<img src='./img/double-angle-right-solid.png' alt='next'></span></li>";
+        
+        let htmlU = '';
+        for (i = 0; i < users.length; i++){
+            htmlU += "<tr><td><div class='wrapper'><div class='round green'><img src='./img/check-solid.png' alt='check'></div></div></td><td><p>tctest</p><p>" + 
+            users[i] + "</p></td><td><p>...</p><p>Default group</p></td></tr>"
+        }        
+        document.getElementById('usersList').innerHTML = htmlU;
+    }
+
+    //next перемещается на 1 до полследней страницы и 
+    //потом на кнопку не реагирует
+    //соотвестственно отрислвываются юзеры и выделяется активная страница 
+    function nextPage(e){
+        let pages = document.getElementsByTagName('li');
+        let cnt = document.getElementsByTagName('li').length - 1;
+        for (let i = 0; i < pages.length - 1; i++){
+            if(pages[i].classList.contains('selected')){
+                activePage = i+1;
+            };
+        };
+        if (activePage < cnt) {
+            getUsers(activePage + 1);
+        }
+    }
+
+    //про выходе удаляются все куки на фронте и токен в базе данных
+    function logOut(){
+        let cookies = document.cookie
+            .split(';')
+            .map(cookie => cookie.split('='))
+            .reduce((accumulator, [key, value]) => 
+                ({...accumulator, [key.trim()]: decodeURIComponent(value)}),  
+            {});
+        let token = cookies.KC_token;
+        document.cookie = "KC_token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        document.cookie = "KC_rm=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        fetch('http://test/KC/server/auth/' + token, {
+            method: 'DELETE'
+        });
+        document.location.href='http://test/KC/login.html';
+    }
+
+    //удаление кук при закрытии страницы,
+    //если галочка 'Remember me' не была нажата
+    window.addEventListener('beforeunload',function(){
+        let cookies = document.cookie
+            .split(';')
+            .map(cookie => cookie.split('='))
+            .reduce((accumulator, [key, value]) => 
+                ({...accumulator, [key.trim()]: decodeURIComponent(value)}),  
+            {});
+        let rm = cookies.KC_rm;
+        if (rm == 'no'){
+            let token = cookies.KC_token;
+            document.cookie = "KC_token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+            document.cookie = "KC_rm=; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+            fetch('http://test/KC/server/auth/' + token, {
+            method: 'DELETE'
+            });
+        }
+    })
+
+    //предотвращение прямого попадания на user.html,
+    //если галочка "remember me" не была нажата
+    document.addEventListener("DOMContentLoaded", async ()=>{
+        let cookies = document.cookie
+            .split(';')
+            .map(cookie => cookie.split('='))
+            .reduce((accumulator, [key, value]) => 
+                ({...accumulator, [key.trim()]: decodeURIComponent(value)}),  
+            {});
+        let token = cookies.KC_token;
+        let formData = new FormData();
+        formData.append('token', token);
+        let res = await fetch ('http://test/KC/server/auth/', {
+            method: 'POST',
+            body: formData,
+        });
+        let response = await res.json();
+        if (response.status == 'error'){
+            document.location.href='http://test/KC/login.html';
+        }
+    })
+
+</script>
+</html>

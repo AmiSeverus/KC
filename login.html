@@ -1,0 +1,103 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/login.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="wrapper">
+            <img src="./img/Logo.svg" alt="logo">
+            <p class="welcome">Welcome to the Learning Management System</p>
+            <p class="action">Please log in to continue</p>
+            <form class="form">
+                <div class="user">
+                    <img src="./img/user.svg" alt="user">
+                    <input type="text" name="user" autocomplete="off" required placeholder="Username">
+                </div>
+                <div class="password">
+                    <img src="./img/password.svg" alt="password">
+                    <input type="password" name="password" autocomplete="off" required placeholder="Password">
+                </div>
+                <div class="checkbox">
+                    <input type="checkbox" name="checkbox" id="checkbox">
+                    <div class='check'><img src="./img/check-solid.png" alt="check" onclick="checkBox(event)"></div>
+                    <span>Remember me</span>
+                </div>
+                <div class="button" onclick="sendForm()">
+                    <span>Log In</span>
+                    <img src="./img/angle-right-solid.png" alt="arrow">
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+<script>
+    //отрисовка кастомного checkbox 'remember me'
+    function checkBox (e){
+        if(!e.target.parentElement.classList.contains('clicked')){
+            e.target.parentElement.classList.add('clicked');
+            e.target.parentElement.parentElement.firstElementChild.setAttribute('checked', true);
+        } else {
+            e.target.parentElement.classList.remove('clicked');
+            e.target.parentElement.parentElement.firstElementChild.setAttribute('checked', false);
+        };
+    };
+
+    //проверка логина
+    //в случае ошибки - alert
+    //в случае удачи - создание кук(token и remember me) и редирект на login.html
+    async function sendForm (){
+        let inputs = document.getElementsByTagName('input');
+        let auto = inputs[2].getAttribute('checked');
+        let formData = new FormData();
+        formData.append('login', inputs[0].value);
+        formData.append('password', inputs[1].value);
+        let res = await fetch ('http://test/KC/server/auth/', {
+            method: 'POST',
+            body: formData,
+        });
+        let response = await res.json();
+
+        if (response.status == 'succes'){
+            if (auto == 'true'){
+                document.cookie = "KC_token=" + response.token;
+                document.cookie = "KC_rm=yes";
+                document.location.href='http://test/KC/user.html';                
+            } else {
+                document.cookie = "KC_rm=no";
+                document.cookie = "KC_token=" + response.token;
+                document.location.href='http://test/KC/user.html';
+            };
+        } else {
+            alert('Wrong login/password');
+        }
+    };
+
+    //редирект на login.html если была авторизация с 
+    //нажатой 'remember me'
+    document.addEventListener("DOMContentLoaded", async ()=>{
+        let cookies = document.cookie
+            .split(';')
+            .map(cookie => cookie.split('='))
+            .reduce((accumulator, [key, value]) => 
+                ({...accumulator, [key.trim()]: decodeURIComponent(value)}),  
+            {});
+        let token = cookies.KC_token;
+        let formData = new FormData();
+        formData.append('token', token);
+        let res = await fetch ('http://test/KC/server/auth/', {
+            method: 'POST',
+            body: formData,
+        });
+        let response = await res.json();
+        if (response.status == 'succes'){
+            document.location.href='http://test/KC/user.html';
+        }
+    })
+
+</script>
+</html>
