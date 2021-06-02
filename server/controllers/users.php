@@ -4,7 +4,7 @@ class users extends controller {
     //возвращаем список юзеров уже с пагинацией согласно данных gjkextyys[ lfyys[]]
     public function GET ($data){
         //если $data не целое положительное число, приравниваем к 1
-        //чтоб избежать sql инъекции
+        //чтоб избежать sql инъекции 
         if (!is_int($data) && $data <= 0){
             $data = 1;
         };
