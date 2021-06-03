@@ -6,6 +6,7 @@ header ('Content-type: json/application');
 include_once 'utils/controller.php';
 include_once 'utils/db.php';
 
+//rewrite is switched on in .htaccess file
 //в файле .htaccess включен rewrite
 $params = explode('/', rtrim($_GET['q'], '/'));
 $controller = $params[0];
@@ -33,7 +34,9 @@ switch($action){
         $controller->$action($_POST);
         break;
     case 'GET':
-        $params[1] ? $controller->$action($params[1]) : $controller->$action(1);
+        $page = $params[1] ? $params[1] : 1;
+        $token = $_GET['token'] ? $_GET['token'] : 1;
+        $controller->$action($page, $token);
         break;
     case 'DELETE':
         $controller->$action($params[1]);

@@ -36,6 +36,7 @@
 </body>
 
 <script>
+    //custon checkbox
     //отрисовка кастомного checkbox 'remember me'
     function checkBox (e){
         if(!e.target.parentElement.classList.contains('clicked')){
@@ -47,6 +48,8 @@
         };
     };
 
+    //login check
+    //if ok - cookis (token and remember me) are set up and redirect to login.html page
     //проверка логина
     //в случае ошибки - alert
     //в случае удачи - создание кук(token и remember me) и редирект на login.html
@@ -64,7 +67,9 @@
 
         if (response.status == 'succes'){
             if (auto == 'true'){
-                document.cookie = "KC_token=" + response.token;
+                //if remember me is checked set cookies for 3 days
+                //если 'remember me' нажата cookie устанавливаются сроком на 3 дня
+                document.cookie = "KC_token=" + response.token + '; max-age=' + 60*60*24*3;
                 document.cookie = "KC_rm=yes";
                 document.location.href='http://test/KC/user.html';                
             } else {
@@ -77,6 +82,8 @@
         }
     };
 
+    //going straight to login.html with beforehand
+    //a user authorized with 'remember me' checked
     //редирект на login.html если была авторизация с 
     //нажатой 'remember me'
     document.addEventListener("DOMContentLoaded", async ()=>{

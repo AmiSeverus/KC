@@ -29,43 +29,68 @@
     </footer>
 </body>
 
-<script>
-
+<script>  
+    //in the page an active page is passed
+    //accordingly a list of 5 users is recieved
+    //pagination is realized on backend side
+    //to avoid passing a big amount of data
     //получение списка выводимых юзеров, 
     //в параметр page передается номер номер страницы, 
     //которую надо вывести и юзеры соответствующие ей
     //пагинация реализована на стороне back,
     //фронт получает уже готовый список юзеров для отрисовки
     async function getUsers(page){
-        let res = await fetch('http://test/KC/server/users/' + page, {
+        let cookies = document.cookie
+            .split(';')
+            .map(cookie => cookie.split('='))
+            .reduce((accumulator, [key, value]) => 
+                ({...accumulator, [key.trim()]: decodeURIComponent(value)}),  
+            {});
+        let token = cookies.KC_token;
+
+        let res = await fetch('http://test/KC/server/users/' + page + '?token=' + token, {
             headers: {
                 'Content-Type': 'application/json',
                 'charset':'UTF-8',
             }
         });
         let data = await res.json();
-        let users = data[0];
-        let pages = Math.ceil(data[1].cnt / 5);
-        let htmlP = '';
-        //определяем какая страница д.б. выделена - активна
-        for (i = 1; i <= pages; i++){
-            if (i == page){
-                htmlP += "<li class='selected' onclick='getUsers(" + i + ")'>" + i + "</li>";
-            } else {
-                htmlP += "<li onclick='getUsers(" + i + ")'>" + i + "</li>"
+        if (data.status == 'error'){
+            document.cookie = "KC_token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+            document.cookie = "KC_rm=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+            fetch('http://test/KC/server/auth/' + token, {
+            method: 'DELETE'
+        });
+        document.location.href='http://test/KC/login.html';            
+        } else {
+            let users = data[0];
+            let pages = Math.ceil(data[1].cnt / 5);
+            let htmlP = '';
+            //detect what page is active
+            //определяем какая страница д.б. выделена - активна
+            for (i = 1; i <= pages; i++){
+                if (i == page){
+                    htmlP += "<li class='selected' onclick='getUsers(" + i + ")'>" + i + "</li>";
+                } else {
+                    htmlP += "<li onclick='getUsers(" + i + ")'>" + i + "</li>"
+                }
             }
-        }
-        //отрисовываем юзеров
-        document.getElementById('pagesList').innerHTML = htmlP + "<li><span onclick='nextPage(event)'>Next<img src='./img/double-angle-right-solid.png' alt='next'></span></li>";
+            //parse user list in html
+            //отрисовываем юзеров
+            document.getElementById('pagesList').innerHTML = htmlP + "<li><span onclick='nextPage(event)'>Next<img src='./img/double-angle-right-solid.png' alt='next'></span></li>";
         
-        let htmlU = '';
-        for (i = 0; i < users.length; i++){
-            htmlU += "<tr><td><div class='wrapper'><div class='round green'><img src='./img/check-solid.png' alt='check'></div></div></td><td><p>tctest</p><p>" + 
-            users[i] + "</p></td><td><p>...</p><p>Default group</p></td></tr>"
+            let htmlU = '';
+            for (i = 0; i < users.length; i++){
+                htmlU += "<tr><td><div class='wrapper'><div class='round green'><img src='./img/check-solid.png' alt='check'></div></div></td><td><p>tctest</p><p>" + 
+                users[i] + "</p></td><td><p>...</p><p>Default group</p></td></tr>"
+            }        
+            document.getElementById('usersList').innerHTML = htmlU;
         }        
-        document.getElementById('usersList').innerHTML = htmlU;
     }
 
+    //button 'next' move active page to the next till last one page
+    //then it stops reacting
+    //accordingly front gets a list of 5 users and mark the active page
     //next перемещается на 1 до полследней страницы и 
     //потом на кнопку не реагирует
     //соотвестственно отрислвываются юзеры и выделяется активная страница 
@@ -82,6 +107,7 @@
         }
     }
 
+    //when log out all cookies are deleted as well as token in database
     //про выходе удаляются все куки на фронте и токен в базе данных
     function logOut(){
         let cookies = document.cookie
@@ -99,6 +125,9 @@
         document.location.href='http://test/KC/login.html';
     }
 
+
+    //delete token from cookies when leaving page
+    //if 'remember me' was not checked
     //удаление кук при закрытии страницы,
     //если галочка 'Remember me' не была нажата
     window.addEventListener('beforeunload',function(){
@@ -119,6 +148,8 @@
         }
     })
 
+    //avoid straight going to user.html
+    //if 'remember me' was not 'checked'
     //предотвращение прямого попадания на user.html,
     //если галочка "remember me" не была нажата
     document.addEventListener("DOMContentLoaded", async ()=>{
