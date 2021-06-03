@@ -7,7 +7,8 @@
 - rewrite реализован в файле .htaccess
 - база данных в папка mysql
 
-#Comments
+# Comments
+
 - the work is done in accordance with the task (directory - task)
 - a front side is represented by user.html, login.html, img, css
 - a back side is represented by server
