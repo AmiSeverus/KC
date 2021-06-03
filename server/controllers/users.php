@@ -7,7 +7,7 @@ class users extends controller
     public function GET($data, $token)
     {
         $user = mysqli_fetch_assoc(mysqli_query($this->db, "select * from api_users where token = '" . mysqli_real_escape_string($this->db, $token) . "'"));
-        if (!$user) {
+        if (!isset($user)) {
             echo json_encode(['status'=>'error']);
         } else {
             //if $data <=0 make it 1 to avoid possible sql injections
