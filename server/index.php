@@ -34,8 +34,8 @@ switch($action){
         $controller->$action($_POST);
         break;
     case 'GET':
-        $page = $params[1] ? $params[1] : 1;
-        $token = $_GET['token'] ? $_GET['token'] : 1;
+        $page = isset($params[1]) ? $params[1] : 1;
+        $token = isset($_GET['token']) ? $_GET['token'] : 1;
         $controller->$action($page, $token);
         break;
     case 'DELETE':
