@@ -8,11 +8,11 @@
 - база данных в папка mysql
 
 #Comments
-- work is done in accordance with task (directory - task)
-- front side is represented by user.html, login.html, img, css
-- back side is represented by server
-- for correct work from and back sides are to be placed in root in folders test/KC
-- rewrite is switched on in .htaccess file
-- in folder 'mysql' an example of the database can be found
+- the work is done in accordance with the task (directory - task)
+- a front side is represented by user.html, login.html, img, css
+- a back side is represented by server
+- for correct work the front and back sides are to be placed in the root in the folders test/KC
+- rewrite is switched on in the .htaccess file
+- in the folder 'mysql' an example of the database can be found
   
 
