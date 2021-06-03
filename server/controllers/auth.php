@@ -17,7 +17,7 @@ class auth extends controller {
             //-отсутствия открытых данных в базе данных
             //предосвращения sql-инъекции
             $id = mysqli_fetch_assoc(mysqli_query($this->db, "select id from api_users where username = '" . md5($data['login']) . "' and password = '" .  md5($data['password']) ."'"))['id'];
-            if ($id){
+            if (isset($id)){
                 //use md5 from random_int to get a crypto-resisrant value
                 //используем md5 от спец.функции для криптоскойких (согласно документации) значений
                 $token = md5(random_int(PHP_INT_MIN, PHP_INT_MAX));
