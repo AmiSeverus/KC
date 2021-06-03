@@ -7,7 +7,7 @@ class auth extends controller {
         //if POST does not have key 'token' - check by login and password
         //если в POST пишел ключ - token - проверяем авторизован ли юзер по нему,
         //если нет - по username и password
-        if (!$data['token']) {
+        if (!isset($data['token'])) {
             //use md5 for:
             //-unique value
             //-not to store open data in database
